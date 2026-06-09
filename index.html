@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clube das Dorotecas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+
+<!-- ===================== TELA DE LOGIN / CADASTRO ===================== -->
+<div id="loginScreen" class="login-screen">
+
+  <!-- CARD: ENTRAR -->
+  <div class="login-card" id="cardLogin">
+    <div class="login-logo">Clube das <em>Dorotecas</em></div>
+    <p class="login-subtitle">Entre com sua conta para acessar a turma</p>
+    <div id="loginError" class="login-error" style="display:none"></div>
+    <div class="login-form">
+      <div class="field-group">
+        <label>E-mail</label>
+        <input type="email" id="loginEmail" placeholder="professora@email.com" />
+      </div>
+      <div class="field-group">
+        <label>Senha</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" />
+      </div>
+      <button class="btn btn-primary login-btn" id="loginBtn" onclick="doLogin()">Entrar</button>
+    </div>
+    <div class="login-footer">
+      <span id="loginLoading" style="display:none;color:var(--text-muted);font-size:0.85rem;">Entrando…</span>
+      <p class="auth-switch">Esqueceu a senha? <button class="link-btn" onclick="showForgot()">Redefinir</button></p>
+      <p class="auth-switch">Ainda não tem conta? <button class="link-btn" onclick="showRegister()">Criar cadastro</button></p>
+    </div>
+  </div>
+
+  <!-- CARD: CADASTRO -->
+  <div class="login-card" id="cardRegister" style="display:none">
+    <div class="login-logo">Clube das <em>Dorotecas</em></div>
+    <p class="login-subtitle">Crie sua conta de professora</p>
+    <div id="registerError" class="login-error" style="display:none"></div>
+    <div id="registerSuccess" class="login-success" style="display:none"></div>
+    <div class="login-form">
+      <div class="field-group">
+        <label>Seu nome</label>
+        <input type="text" id="registerName" placeholder="Ex: Profa Ana Lima" maxlength="50" />
+      </div>
+      <div class="field-group">
+        <label>E-mail</label>
+        <input type="email" id="registerEmail" placeholder="professora@email.com" />
+      </div>
+      <div class="field-group">
+        <label>Senha <span style="font-weight:400;text-transform:none;font-size:0.72rem;">(min. 6 caracteres)</span></label>
+        <input type="password" id="registerPassword" placeholder="••••••••" />
+      </div>
+      <button class="btn btn-success login-btn" id="registerBtn" onclick="doRegister()">Criar conta</button>
+    </div>
+    <div class="login-footer">
+      <span id="registerLoading" style="display:none;color:var(--text-muted);font-size:0.85rem;">Criando conta…</span>
+      <p class="auth-switch">Ja tem conta? <button class="link-btn" onclick="showLoginCard()">Entrar</button></p>
+    </div>
+  </div>
+
+  <!-- CARD: REDEFINIR SENHA -->
+  <div class="login-card" id="cardForgot" style="display:none">
+    <div class="login-logo">Clube das <em>Dorotecas</em></div>
+    <p class="login-subtitle">Informe seu e-mail para receber o link de redefinicao</p>
+    <div id="forgotError" class="login-error" style="display:none"></div>
+    <div id="forgotSuccess" class="login-success" style="display:none"></div>
+    <div class="login-form">
+      <div class="field-group">
+        <label>E-mail</label>
+        <input type="email" id="forgotEmail" placeholder="professora@email.com" />
+      </div>
+      <button class="btn btn-primary login-btn" id="forgotBtn" onclick="doForgot()">Enviar link</button>
+    </div>
+    <div class="login-footer">
+      <span id="forgotLoading" style="display:none;color:var(--text-muted);font-size:0.85rem;">Enviando…</span>
+      <p class="auth-switch">Lembrou a senha? <button class="link-btn" onclick="showLoginCard()">Entrar</button></p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== APP PRINCIPAL ===================== -->
+<div id="appScreen" style="display:none">
+
+<header>
+  <div class="logo">Clube das <em>Dorotecas</em></div>
+  <div class="header-center">
+    <div class="sala-selector">
+      <select id="salaSelect" onchange="switchSala(this.value)"></select>
+      <button class="btn-pencil" onclick="renameSala()" title="Renomear sala"><i class="ti ti-edit" style="color:#FFFFFE;font-size:1rem;" aria-hidden="true"></i></button>
+      <button class="btn btn-sm btn-sala-new" onclick="openNewSalaModal()">Nova sala</button>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill"><span id="headerTeacherName"></span> &nbsp;|&nbsp; Alunos: <span id="hStudents">0</span></div>
+    <button class="btn btn-sm" onclick="doLogout()" style="background:rgba(255,255,255,0.07);color:var(--text-muted);">Sair</button>
+  </div>
+</header>
+
+<!-- Barra de sala mobile (visível só em telas pequenas) -->
+<div class="sala-bar" style="display:none">
+  <select id="salaSelectMobile" onchange="switchSala(this.value)"></select>
+  <button class="btn-pencil" onclick="renameSala()" title="Renomear sala"><i class="ti ti-edit" style="color:#FFFFFE;font-size:1rem;" aria-hidden="true"></i></button>
+  <button class="btn btn-sm btn-sala-new" onclick="openNewSalaModal()">Nova sala</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('alunos')">Alunos</button>
+  <button class="tab" onclick="switchTab('ranking')">Ranking</button>
+  <button class="tab" onclick="switchTab('motivos')">Critérios</button>
+</div>
+
+<div class="main">
+
+  <!-- PAINEL: ALUNOS -->
+  <div class="panel active" id="panel-alunos">
+    <div class="alunos-topbar">
+      <div class="add-bar">
+        <div class="field-group" style="max-width:260px">
+          <label>Nome do aluno</label>
+          <input type="text" id="newName" placeholder="Ex: Maria Silva" maxlength="30" />
+        </div>
+        <button class="btn btn-primary" onclick="addStudent()">Cadastrar</button>
+      </div>
+      <div class="alunos-tools">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Buscar aluno..." oninput="renderStudents()" />
+        </div>
+        <div class="view-toggle">
+          <button id="btnViewGrid" class="view-btn active" onclick="setView('grid')">Cards</button>
+          <button id="btnViewList" class="view-btn" onclick="setView('list')">Lista</button>
+        </div>
+      </div>
+    </div>
+    <div id="studentsGrid" class="students-grid"></div>
+  </div>
+
+  <!-- PAINEL: RANKING -->
+  <div class="panel" id="panel-ranking">
+    <div class="ranking-header">
+      <div class="ranking-title">Ranking da Turma</div>
+    </div>
+    <div class="ranking-list" id="rankingList"></div>
+  </div>
+
+  <!-- PAINEL: MOTIVOS -->
+  <div class="panel" id="panel-motivos">
+    <div class="reasons-section">
+      <div class="reasons-col">
+        <div class="col-title earn">Como GANHAR dorotecas</div>
+        <div class="add-reason-form">
+          <input type="text" id="earnText" placeholder="Ex: Participou da aula" maxlength="50" />
+          <div class="row">
+            <input type="number" id="earnCoins" placeholder="Moedas" min="1" max="99" style="width:110px;flex-shrink:0" />
+            <button class="btn btn-success" style="flex:1" onclick="addReason('earn')">Adicionar</button>
+          </div>
+        </div><br>
+        <div class="reason-list" id="earnList"></div>
+      </div>
+      <div class="reasons-col">
+        <div class="col-title lose">Como PERDER dorotecas</div>
+        <div class="add-reason-form">
+          <input type="text" id="loseText" placeholder="Ex: Nao fez a atividade" maxlength="50" />
+          <div class="row">
+            <input type="number" id="loseCoins" placeholder="Moedas" min="1" max="99" style="width:110px;flex-shrink:0" />
+            <button class="btn btn-danger" style="flex:1" onclick="addReason('lose')">Adicionar</button>
+          </div>
+        </div><br>
+        <div class="reason-list" id="loseList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL: HISTORICO -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Historico</h3>
+      <button class="modal-close" onclick="closeModalDirect()">X</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- MODAL: NOVA SALA -->
+<div class="modal-overlay" id="newSalaOverlay" onclick="closeNewSalaModal(event)">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <h3>Nova Sala</h3>
+      <button class="modal-close" onclick="closeNewSalaModalDirect()">X</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label>Nome da sala</label>
+        <input type="text" id="newSalaName" placeholder="Ex: Turma A - 3 ano" maxlength="40" />
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="createSala()">Criar sala</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: FOTO DO ALUNO -->
+<div class="modal-overlay" id="photoOverlay" onclick="closePhotoModal(event)">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <h3 id="photoModalTitle">Foto do aluno</h3>
+      <button class="modal-close" onclick="closePhotoModalDirect()">X</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;align-items:center;gap:16px;padding-bottom:24px">
+      <div id="photoPreview" class="photo-preview-wrap"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <label class="btn btn-primary btn-sm" style="cursor:pointer">
+          Escolher arquivo
+          <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="handlePhotoFile(event)" />
+        </label>
+        <label class="btn btn-sm" style="background:var(--purple);color:white;cursor:pointer">
+          Camera
+          <input type="file" id="photoCamInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoFile(event)" />
+        </label>
+      </div>
+      <button class="btn btn-success" style="width:100%" onclick="savePhoto()">Salvar foto</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div id="toast"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
